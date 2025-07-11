@@ -1,0 +1,23 @@
+---
+import DashboardSelector from '../components/DashboardSelector.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+	<main class="w-full h-screen bg-gray-50">
+		<div class="w-full h-full flex flex-col">
+			<header class="text-center py-6 bg-white shadow-sm">
+				<h1 class="text-3xl font-bold text-gray-900 mb-2">
+					Dashboard Viewer
+				</h1>
+				<p class="text-lg text-gray-600">
+					Selecciona un dashboard de la lista para visualizarlo
+				</p>
+			</header>
+			
+			<div class="flex-1 p-4">
+				<DashboardSelector />
+			</div>
+		</div>
+	</main>
+</Layout>

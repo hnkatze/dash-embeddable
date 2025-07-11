@@ -1,0 +1,268 @@
+---
+// Este componente manejará la selección y visualización de dashboards
+---
+
+<div class="w-full h-full  mx-auto flex flex-col">
+  <div class="w-full flex flex-col sm:flex-row gap-4 mb-4 flex-shrink-0">
+    <div class="flex-1 min-w-64">
+      <label for="dashboard-select" class="block mb-2 text-sm font-semibold text-gray-700">
+        Seleccionar Dashboard:
+      </label>
+      <select 
+        id="dashboard-select" 
+        class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base bg-white transition-colors duration-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+      >
+        <option value="">Cargando dashboards...</option>
+      </select>
+    </div>
+    <button 
+      id="show-dashboard" 
+      class="px-6 py-2 bg-blue-600 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-colors duration-200 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed self-end"
+      disabled
+    >
+      Mostrar Dashboard
+    </button>
+  </div>
+  
+  <div id="loading" class="w-full hidden flex-col items-center justify-center flex-1 p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 min-h-48">
+    <div class="w-10 h-10 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+    <p class="text-gray-600 text-base m-0">Cargando dashboard...</p>
+  </div>
+  
+  <div id="dashboard-container" class="w-full bg-white rounded-lg shadow-lg overflow-auto flex-1 min-h-96 relative hidden">
+    <!-- El componente se creará dinámicamente aquí -->
+  </div>
+  
+  <div id="error-message" class="w-full p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mt-4 hidden"></div>
+</div>
+
+<script>
+  // API Key - Mantenla segura en producción
+  const API_KEY = '27c192e8-d514-4c54-a16f-7822192453b1';
+  const API_BASE_URL = 'https://api.us.embeddable.com/api/v1';
+  
+  // Tipos de datos
+  interface Dashboard {
+    id: string;
+    name: string;
+    lastPublishedAt: Record<string, string>;
+  }
+  
+  interface DashboardsResponse {
+    embeddables: Dashboard[];
+  }
+  
+  interface TokenResponse {
+    token: string;
+  }
+  
+  let dashboards: Dashboard[] = [];
+  
+  // Elementos del DOM
+  const selectElement = document.getElementById('dashboard-select') as HTMLSelectElement | null;
+  const showButton = document.getElementById('show-dashboard') as HTMLButtonElement | null;
+  const loadingElement = document.getElementById('loading') as HTMLElement | null;
+  const dashboardContainer = document.getElementById('dashboard-container') as HTMLElement | null;
+  let embeddableComponent: HTMLElement | null = null;
+  const errorMessage = document.getElementById('error-message') as HTMLElement | null;
+  
+  // Función para mostrar/ocultar elementos
+  function toggleElement(element: HTMLElement | null, show: boolean): void {
+    if (!element) return;
+    
+    if (show) {
+      element.classList.remove('hidden');
+      // Agregar flex para el loading
+      if (element.id === 'loading') {
+        element.classList.add('flex');
+      }
+    } else {
+      element.classList.add('hidden');
+      // Remover flex para el loading
+      if (element.id === 'loading') {
+        element.classList.remove('flex');
+      }
+    }
+  }
+  
+  // Función para mostrar errores
+  function showError(message: string): void {
+    if (!errorMessage) return;
+    
+    errorMessage.textContent = message;
+    toggleElement(errorMessage, true);
+    toggleElement(loadingElement, false);
+  }
+  
+  // Función para obtener la lista de dashboards
+  async function fetchDashboards(): Promise<Dashboard[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/embeddables`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: ${response.statusText}`);
+      }
+      
+      const data: DashboardsResponse = await response.json();
+      return data.embeddables || [];
+    } catch (error) {
+      console.error('Error fetching dashboards:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      showError('Error al cargar la lista de dashboards: ' + errorMessage);
+      return [];
+    }
+  }
+  
+  // Función para obtener el token de un dashboard específico
+  async function fetchDashboardToken(embeddableId: string): Promise<string | null> {
+    try {
+      console.log('Solicitando token para embeddableId:', embeddableId);
+      
+      // Aquí necesitaré los parámetros específicos que me proporciones
+      const tokenRequest = {
+        embeddableId: embeddableId,
+        expiryInSeconds: 60 * 60 * 24, // 24 horas
+        securityContext: {
+          // Agregar contexto de seguridad según tus necesidades
+        },
+        user: 'erick.alvarado@cit.hn', // Identificador único del usuario
+        environment: 'default' // Ambiente por defecto
+      };
+      
+      console.log('Datos de la petición del token:', tokenRequest);
+      
+      const response = await fetch(`${API_BASE_URL}/security-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${API_KEY}`
+        },
+        body: JSON.stringify(tokenRequest)
+      });
+      
+      console.log('Respuesta del servidor:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        // Intentar obtener más detalles del error
+        const errorText = await response.text();
+        console.error('Error del servidor:', errorText);
+        throw new Error(`Error ${response.status}: ${response.statusText} - ${errorText}`);
+      }
+      
+      const data: TokenResponse = await response.json();
+      console.log('Token recibido exitosamente');
+      return data.token;
+    } catch (error) {
+      console.error('Error completo fetching dashboard token:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      showError('Error al obtener el token del dashboard: ' + errorMessage);
+      return null;
+    }
+  }
+  
+  // Función para mostrar el dashboard
+  async function showDashboard(): Promise<void> {
+    if (!selectElement) {
+      showError('Error: Elemento select no encontrado');
+      return;
+    }
+    
+    const selectedDashboardId = selectElement.value;
+    
+    if (!selectedDashboardId) {
+      showError('Por favor selecciona un dashboard');
+      return;
+    }
+    
+    // Mostrar loading
+    toggleElement(loadingElement, true);
+    toggleElement(errorMessage, false);
+    toggleElement(dashboardContainer, false);
+    
+    console.log('Obteniendo token para dashboard:', selectedDashboardId);
+    
+    // Obtener token
+    const token = await fetchDashboardToken(selectedDashboardId);
+    
+    console.log('Token obtenido:', token ? 'Sí' : 'No', token?.substring(0, 50) + '...');
+    
+    if (token && dashboardContainer) {
+      console.log('Creando componente embeddable dinámicamente...');
+      
+      // Limpiar el contenedor
+      dashboardContainer.innerHTML = '';
+      
+      // Crear el componente em-beddable dinámicamente
+      embeddableComponent = document.createElement('em-beddable');
+      embeddableComponent.setAttribute('token', token);
+      embeddableComponent.className = 'block w-full h-full border-0';
+      
+      // Agregar el componente al contenedor
+      dashboardContainer.appendChild(embeddableComponent);
+      
+      console.log('Componente embeddable creado y agregado al DOM');
+      
+      // Mostrar el dashboard
+      toggleElement(loadingElement, false);
+      toggleElement(dashboardContainer, true);
+      
+    } else if (!dashboardContainer) {
+      showError('Error: Contenedor del dashboard no encontrado');
+      showError('Error: Componente embeddable no encontrado');
+    } else {
+      showError('Error: No se pudo obtener el token del dashboard');
+    }
+  }
+  
+  // Función para inicializar la aplicación
+  async function initializeApp(): Promise<void> {
+    if (!selectElement || !showButton) {
+      showError('Error: Elementos de la interfaz no encontrados');
+      return;
+    }
+    
+    // Cargar lista de dashboards
+    dashboards = await fetchDashboards();
+    
+    if (dashboards.length > 0) {
+      // Limpiar el select
+      selectElement.innerHTML = '<option value="">Selecciona un dashboard...</option>';
+      
+      // Agregar opciones al select
+      dashboards.forEach((dashboard: Dashboard) => {
+        const option = document.createElement('option');
+        option.value = dashboard.id;
+        option.textContent = dashboard.name;
+        selectElement?.appendChild(option);
+      });
+      
+      // Habilitar el botón cuando se seleccione un dashboard
+      selectElement.addEventListener('change', () => {
+        if (showButton && selectElement) {
+          showButton.disabled = !selectElement.value;
+        }
+      });
+      
+      // Habilitar el botón
+      showButton.disabled = false;
+    } else {
+      selectElement.innerHTML = '<option value="">No hay dashboards disponibles</option>';
+    }
+  }
+  
+  // Event listeners
+  if (showButton) {
+    showButton.addEventListener('click', showDashboard);
+  }
+  
+  // Inicializar cuando se cargue la página
+  document.addEventListener('DOMContentLoaded', initializeApp);
+</script>
