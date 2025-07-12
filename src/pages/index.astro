@@ -1,23 +1,91 @@
 ---
 import DashboardSelector from '../components/DashboardSelector.astro';
 import Layout from '../layouts/Layout.astro';
+
+// Verificar autenticación del lado del servidor
+const cookies = Astro.request.headers.get('cookie') || '';
+const isAuthenticated = cookies.includes('authenticated=true');
+
+// Si no está autenticado, redirigir al login
+if (!isAuthenticated) {
+  return Astro.redirect('/login');
+}
+
+// Extraer el nombre de usuario de las cookies
+const username = cookies.split(';')
+  .find(c => c.trim().startsWith('username='))
+  ?.split('=')[1] || 'Usuario';
+
+// Decodificar el nombre de usuario
+const decodedUsername = decodeURIComponent(username);
 ---
 
 <Layout>
-	<main class="w-full h-screen bg-gray-50">
-		<div class="w-full h-full flex flex-col">
-			<header class="text-center py-6 bg-white shadow-sm">
-				<h1 class="text-3xl font-bold text-gray-900 mb-2">
+	<main class="w-full min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative">
+		<!-- Animated background shapes -->
+		<div class="absolute inset-0 overflow-hidden">
+			<div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob"></div>
+			<div class="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000"></div>
+			<div class="absolute top-40 left-40 w-80 h-80 bg-indigo-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000"></div>
+		</div>
+
+		<div class="relative z-10 w-full min-h-screen flex flex-col">
+			<header class="text-center py-6 bg-white/80 backdrop-blur-lg shadow-lg relative border-b border-white/20">
+				<h1 class="text-3xl font-bold text-gray-900 mb-2 animate-fade-in-down">
 					Dashboard Viewer
 				</h1>
-				<p class="text-lg text-gray-600">
+				<p class="text-lg text-gray-600 animate-fade-in-down" style="animation-delay: 0.2s;">
 					Selecciona un dashboard de la lista para visualizarlo
 				</p>
+				<div class="absolute top-4 right-4 flex items-center gap-4 animate-fade-in" style="animation-delay: 0.4s;">
+					<div class="flex items-center gap-2 px-3 py-1 bg-white/50 rounded-full backdrop-blur-sm">
+						<div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+						<span class="text-sm text-gray-600">Bienvenido, {decodedUsername}</span>
+					</div>
+					<button id="logout" class="px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white text-sm rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl">
+						<span class="flex items-center gap-2">
+							<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+							</svg>
+							Cerrar Sesión
+						</span>
+					</button>
+				</div>
 			</header>
 			
-			<div class="flex-1 p-4">
+			<div class="flex-1 p-6 animate-fade-in-up pb-8" style="animation-delay: 0.6s;">
 				<DashboardSelector />
 			</div>
 		</div>
 	</main>
 </Layout>
+
+<script>
+	const logoutButton = document.getElementById('logout');
+	
+	// Verificar autenticación al cargar la página
+	document.addEventListener('DOMContentLoaded', () => {
+		const cookies = document.cookie;
+		const sessionAuth = sessionStorage.getItem('authenticated');
+		
+		// Si no hay autenticación válida, redirigir al login
+		if (!cookies.includes('authenticated=true') && sessionAuth !== 'true') {
+			console.log('No hay autenticación válida, redirigiendo al login...');
+			window.location.href = '/login';
+		}
+	});
+	
+	logoutButton?.addEventListener('click', () => {
+		console.log('Cerrando sesión...');
+		
+		// Limpiar cookies
+		document.cookie = 'authenticated=; path=/; max-age=0; SameSite=Lax';
+		document.cookie = 'username=; path=/; max-age=0; SameSite=Lax';
+		
+		// Limpiar sessionStorage
+		sessionStorage.clear();
+		
+		// Redirigir al login
+		window.location.href = '/login';
+	});
+</script>

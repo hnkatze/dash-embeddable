@@ -1,0 +1,61 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout>
+  <main class="container mx-auto p-8">
+    <h1 class="text-3xl font-bold mb-6">Firebase Integration Test</h1>
+    
+    <div id="firebase-status" class="p-4 bg-gray-100 rounded mb-4">
+      <p class="text-gray-700">Checking Firebase connection...</p>
+    </div>
+    
+    <div id="test-results" class="space-y-4"></div>
+  </main>
+</Layout>
+
+<script>
+  import { auth, db } from '../lib/firebase';
+  import { collection, addDoc, getDocs } from 'firebase/firestore';
+  
+  const statusElement = document.getElementById('firebase-status');
+  const resultsElement = document.getElementById('test-results');
+  
+  async function testFirebase() {
+    try {
+      statusElement!.innerHTML = '<p class="text-green-600">Firebase initialized successfully!</p>';
+      
+      const testData = {
+        message: 'Hello from Astro!',
+        timestamp: new Date().toISOString()
+      };
+      
+      const docRef = await addDoc(collection(db, 'test'), testData);
+      resultsElement!.innerHTML += `
+        <div class="p-3 bg-green-100 rounded">
+          <p class="font-semibold">Document added:</p>
+          <p>ID: ${docRef.id}</p>
+          <p>Data: ${JSON.stringify(testData)}</p>
+        </div>
+      `;
+      
+      const querySnapshot = await getDocs(collection(db, 'test'));
+      resultsElement!.innerHTML += `
+        <div class="p-3 bg-blue-100 rounded">
+          <p class="font-semibold">Documents in collection:</p>
+          <ul class="list-disc list-inside">
+      `;
+      
+      querySnapshot.forEach((doc) => {
+        resultsElement!.innerHTML += `<li>${doc.id}: ${JSON.stringify(doc.data())}</li>`;
+      });
+      
+      resultsElement!.innerHTML += '</ul></div>';
+      
+    } catch (error) {
+      statusElement!.innerHTML = `<p class="text-red-600">Firebase error: ${error}</p>`;
+    }
+  }
+  
+  testFirebase();
+</script>

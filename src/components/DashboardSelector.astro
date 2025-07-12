@@ -2,43 +2,83 @@
 // Este componente manejará la selección y visualización de dashboards
 ---
 
-<div class="w-full h-full  mx-auto flex flex-col">
-  <div class="w-full flex flex-col sm:flex-row gap-4 mb-4 flex-shrink-0">
+---
+// Este componente manejará la selección y visualización de dashboards
+---
+
+<div class="w-full mx-auto flex flex-col" style="min-height: calc(100vh - 160px);">
+  <div class="w-full flex flex-col sm:flex-row gap-6 mb-6 flex-shrink-0">
     <div class="flex-1 min-w-64">
-      <label for="dashboard-select" class="block mb-2 text-sm font-semibold text-gray-700">
+      <label for="dashboard-select" class="flex mb-3 text-sm font-semibold text-gray-700 items-center gap-2">
+        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
         Seleccionar Dashboard:
       </label>
-      <select 
-        id="dashboard-select" 
-        class="w-full px-3 py-2 border-2 border-gray-300 rounded-lg text-base bg-white transition-colors duration-200 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-      >
-        <option value="">Cargando dashboards...</option>
-      </select>
+      <div class="relative">
+        <select 
+          id="dashboard-select" 
+          class="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-base bg-white/80 backdrop-blur-sm transition-all duration-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:bg-white hover:border-gray-300 appearance-none cursor-pointer"
+        >
+          <option value="">Cargando dashboards...</option>
+        </select>
+        <div class="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+          </svg>
+        </div>
+      </div>
     </div>
     <button 
       id="show-dashboard" 
-      class="px-6 py-2 bg-blue-600 text-white border-none rounded-lg text-base font-semibold cursor-pointer transition-colors duration-200 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed self-end"
+      class="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none rounded-xl text-base font-semibold cursor-pointer transition-all duration-300 hover:from-blue-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl self-end"
       disabled
     >
-      Mostrar Dashboard
+      <span class="flex items-center justify-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+        </svg>
+        Mostrar Dashboard
+      </span>
     </button>
   </div>
   
-  <div id="loading" class="w-full hidden flex-col items-center justify-center flex-1 p-10 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 min-h-48">
-    <div class="w-10 h-10 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin mb-4"></div>
-    <p class="text-gray-600 text-base m-0">Cargando dashboard...</p>
+  <div id="loading" class="w-full hidden flex-col items-center justify-center flex-1 p-10 bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-dashed border-gray-300 min-h-48 shadow-lg">
+    <div class="relative">
+      <div class="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mb-4"></div>
+      <div class="absolute inset-0 w-12 h-12 border-4 border-transparent border-b-purple-400 rounded-full animate-spin animation-delay-2000"></div>
+    </div>
+    <p class="text-gray-600 text-base m-0 font-medium">Cargando dashboard...</p>
+    <div class="mt-2 flex gap-1">
+      <div class="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+      <div class="w-2 h-2 bg-purple-500 rounded-full animate-bounce animation-delay-200"></div>
+      <div class="w-2 h-2 bg-indigo-500 rounded-full animate-bounce animation-delay-400"></div>
+    </div>
   </div>
   
-  <div id="dashboard-container" class="p-2 w-full bg-white rounded-lg shadow-lg overflow-auto flex-1 min-h-96 relative hidden">
+  <div id="dashboard-container" class="p-4 w-full bg-white/80 backdrop-blur-lg rounded-2xl shadow-2xl border border-white/20 overflow-auto relative hidden" style="min-height: 600px; max-height: none;">
     <!-- El componente se creará dinámicamente aquí -->
   </div>
   
-  <div id="error-message" class="w-full p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mt-4 hidden"></div>
+  <div id="error-message" class="w-full p-4 bg-red-50/90 backdrop-blur-sm border-l-4 border-red-500 rounded-r-xl text-red-700 text-sm mt-4 hidden shadow-lg">
+    <div class="flex items-center gap-3">
+      <div class="flex-shrink-0">
+        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+      </div>
+      <div class="flex-1">
+        <span class="font-medium">Error:</span>
+        <span id="error-text" class="ml-1"></span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-  // API Key - Mantenla segura en producción
-  const API_KEY = '27c192e8-d514-4c54-a16f-7822192453b1';
+  // API Key desde variables de entorno
+  const API_KEY = import.meta.env.PUBLIC_EMBEDDABLE_API_KEY;
   const API_BASE_URL = 'https://api.us.embeddable.com/api/v1';
   
   // Tipos de datos
@@ -85,13 +125,33 @@
     }
   }
   
-  // Función para mostrar errores
+  // Función para ajustar el contenedor dinámicamente
+  function setupDynamicContainer(): void {
+    if (!dashboardContainer) return;
+    
+    // Remover cualquier restricción de altura
+    dashboardContainer.style.maxHeight = 'none';
+    dashboardContainer.style.height = 'auto';
+    
+    console.log('Configurando contenedor dinámico sin restricciones de altura');
+  }
   function showError(message: string): void {
     if (!errorMessage) return;
     
-    errorMessage.textContent = message;
+    const errorText = document.getElementById('error-text');
+    if (errorText) {
+      errorText.textContent = message;
+    } else {
+      errorMessage.textContent = message;
+    }
     toggleElement(errorMessage, true);
     toggleElement(loadingElement, false);
+    
+    // Add shake animation
+    errorMessage.classList.add('animate-shake');
+    setTimeout(() => {
+      errorMessage.classList.remove('animate-shake');
+    }, 500);
   }
   
   // Función para obtener la lista de dashboards
@@ -203,12 +263,27 @@
       // Crear el componente em-beddable dinámicamente
       embeddableComponent = document.createElement('em-beddable');
       embeddableComponent.setAttribute('token', token);
-      embeddableComponent.className = 'block w-full h-full border-0';
+      embeddableComponent.className = 'block w-full border-0';
+      embeddableComponent.style.cssText = 'height: auto; min-height: 800px; width: 100%;';
       
       // Agregar el componente al contenedor
       dashboardContainer.appendChild(embeddableComponent);
       
       console.log('Componente embeddable creado y agregado al DOM');
+      
+      // Función simplificada para ajustar la altura
+      const adjustHeight = () => {
+        if (embeddableComponent) {
+          // Remover cualquier restricción de altura del contenedor
+          dashboardContainer.style.height = 'auto';
+          dashboardContainer.style.maxHeight = 'none';
+          
+          console.log('Altura del contenedor ajustada para permitir crecimiento libre');
+        }
+      };
+      
+      // Ajustar altura después de un breve delay
+      setTimeout(adjustHeight, 500);
       
       // Mostrar el dashboard
       toggleElement(loadingElement, false);
@@ -228,6 +303,9 @@
       showError('Error: Elementos de la interfaz no encontrados');
       return;
     }
+    
+    // Configurar contenedor dinámico
+    setupDynamicContainer();
     
     // Cargar lista de dashboards
     dashboards = await fetchDashboards();
@@ -265,4 +343,13 @@
   
   // Inicializar cuando se cargue la página
   document.addEventListener('DOMContentLoaded', initializeApp);
+  
+  // Manejar redimensionamiento de ventana (mantener sin restricciones)
+  window.addEventListener('resize', () => {
+    if (dashboardContainer && !dashboardContainer.classList.contains('hidden')) {
+      // Asegurar que no haya restricciones de altura
+      dashboardContainer.style.maxHeight = 'none';
+      dashboardContainer.style.height = 'auto';
+    }
+  });
 </script>
