@@ -1,6 +1,6 @@
 import { defineMiddleware } from "astro:middleware";
 
-export const onRequest = defineMiddleware((context, next) => {
+export const onRequest = defineMiddleware(async (context, next) => {
   const url = new URL(context.request.url);
   const pathname = url.pathname;
   
@@ -25,6 +25,15 @@ export const onRequest = defineMiddleware((context, next) => {
   if (isAuthenticated && pathname === '/login') {
     return context.redirect('/', 302);
   }
+
+  // Continuar con la respuesta pero agregar headers de privacidad
+  const response = await next();
   
-  return next();
+  // Agregar headers adicionales de privacidad
+  response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
+  response.headers.set('X-Frame-Options', 'DENY');
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('Referrer-Policy', 'no-referrer');
+  
+  return response;
 });

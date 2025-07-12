@@ -9,6 +9,28 @@ import '../styles/global.css';
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
 		<title>Dashboard Viewer - Embeddable</title>
+		
+		<!-- Meta tags para evitar indexación por motores de búsqueda -->
+		<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate" />
+		<meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+		<meta name="bingbot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+		<meta name="slurp" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+		
+		<!-- Evitar caché y compartir en redes sociales -->
+		<meta name="referrer" content="no-referrer" />
+		<meta property="og:title" content="" />
+		<meta property="og:description" content="" />
+		<meta property="og:image" content="" />
+		<meta property="og:url" content="" />
+		<meta name="twitter:card" content="" />
+		<meta name="twitter:title" content="" />
+		<meta name="twitter:description" content="" />
+		<meta name="twitter:image" content="" />
+		
+		<!-- Evitar indexación adicional -->
+		<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+		<meta http-equiv="Pragma" content="no-cache" />
+		<meta http-equiv="Expires" content="0" />
 	</head>
 	<script type="module" src="https://embed.embeddable.com/js/v1/?region=US"
 	></script>
