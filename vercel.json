@@ -1,0 +1,29 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "astro",
+  "functions": {
+    "src/pages/*.astro": {
+      "maxDuration": 10
+    },
+    "src/middleware.ts": {
+      "maxDuration": 5
+    }
+  },
+  "routes": [
+    {
+      "src": "/login",
+      "dest": "/login"
+    },
+    {
+      "src": "/firebase-test",
+      "dest": "/firebase-test"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
+    }
+  ]
+}

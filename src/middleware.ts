@@ -18,22 +18,12 @@ export const onRequest = defineMiddleware((context, next) => {
   
   // Si no está autenticado y no está en login, redirigir
   if (!isAuthenticated && pathname !== '/login') {
-    return new Response(null, {
-      status: 302,
-      headers: {
-        'Location': '/login'
-      }
-    });
+    return context.redirect('/login', 302);
   }
   
   // Si está autenticado y está en login, redirigir al dashboard
   if (isAuthenticated && pathname === '/login') {
-    return new Response(null, {
-      status: 302,
-      headers: {
-        'Location': '/'
-      }
-    });
+    return context.redirect('/', 302);
   }
   
   return next();
