@@ -1,0 +1,67 @@
+/* Estilos adicionales para el selector de temas */
+.theme-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+.theme-palette-animation {
+  animation: colorPulse 2s infinite;
+}
+
+@keyframes colorPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.theme-indicator-gradient {
+  background: linear-gradient(135deg, rgba(189, 227, 250, 0.2) 0%, rgba(9, 99, 155, 0.2) 100%);
+  border: 1px solid rgba(189, 227, 250, 0.5);
+}
+
+/* Animación para cambio de tema */
+.theme-change-animation {
+  animation: themeChange 0.6s ease-in-out;
+}
+
+@keyframes themeChange {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Estilos para el selector de tema con colores dinámicos */
+.theme-select-custom {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(10px);
+}
+
+.theme-select-custom:focus {
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.2);
+}
+
+/* Estilos para las opciones del tema */
+.theme-option-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.theme-option-display:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.theme-preview-dots {
+  display: flex;
+  gap: 2px;
+}
+
+.theme-preview-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
